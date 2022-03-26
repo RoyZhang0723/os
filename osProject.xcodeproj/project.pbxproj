@@ -25,9 +25,9 @@
 
 /* Begin PBXFileReference section */
 		C15C993D27EE00E100DD8449 /* osProject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = osProject; sourceTree = BUILT_PRODUCTS_DIR; };
-		C15C994827EE015700DD8449 /* project.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = project.h; sourceTree = "<group>"; };
 		C15C994927EE015700DD8449 /* project.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = project.c; sourceTree = "<group>"; };
 		C15C994E27EEE28800DD8449 /* PLS_update.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PLS_update.c; sourceTree = "<group>"; };
+		C15C995127EEEC0C00DD8449 /* comment */ = {isa = PBXFileReference; lastKnownFileType = text; path = comment; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +60,9 @@
 		C15C993F27EE00E100DD8449 /* osProject */ = {
 			isa = PBXGroup;
 			children = (
-				C15C994827EE015700DD8449 /* project.h */,
 				C15C994927EE015700DD8449 /* project.c */,
 				C15C994E27EEE28800DD8449 /* PLS_update.c */,
+				C15C995127EEEC0C00DD8449 /* comment */,
 			);
 			path = osProject;
 			sourceTree = "<group>";

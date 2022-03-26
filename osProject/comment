@@ -1,0 +1,19 @@
+The program comment can be shown in here because if we wirte comment in the code, if it not easy to copy code to the apollo to run
+
+Also everything we need know can be written in here
+
+The format as follow:
+
+"int fd[6][2];"
+pipe from InputModule to ScheduleModule
+fd[0] for FCFS, fd[1] for SJF, fd[2] for output process, fd[3] for analyse process, fd[4] for telling the parent process the child process has finished.
+
+"int index = 0;"
+index is the current child process index
+
+“#define CHILD_NUMBER 4”
+basically, we will have 4 child process.
+child 1 is for create project Team
+child 2 is for Project Meeting Request
+child 3 is for Print Meeting Schedule
+child 4 is for Exit
