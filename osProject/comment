@@ -4,16 +4,40 @@ Also everything we need know can be written in here
 
 The format as follow:
 
-"int fd[6][2];"
-pipe from InputModule to ScheduleModule
-fd[0] for FCFS, fd[1] for SJF, fd[2] for output process, fd[3] for analyse process, fd[4] for telling the parent process the child process has finished.
+
 
 "int index = 0;"
 index is the current child process index
 
-“#define CHILD_NUMBER 4”
-basically, we will have 4 child process.
-child 1 is for create project Team
-child 2 is for Project Meeting Request
-child 3 is for Print Meeting Schedule
-child 4 is for Exit
+“#define CHILD_NUMBER 13”
+basically, we will have 13 child processes.
+child 1~8 : Staff members
+1.Alan
+2.Billy
+3.Cathy
+4.David
+5.Eva
+6.Fanny
+7.Gary
+8.Helen
+
+Child 9~13 : Teams & Projects
+            9:  Team A & Project A
+            10:  Team B & Project B
+            11:  Team C & Project C
+            12:  Team D & Project D
+            13:  Team E & Project E
+
+
+
+"int year(int yr);"
+leap year: return 1
+common year: return 0
+
+
+"int month(int yr, int mth)"
+return the number of dates in a specific month
+
+"int day(char *s1, char *s2)"
+return the number of dates between s1 and s2
+if the date is illegal, return -1
