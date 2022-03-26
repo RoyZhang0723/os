@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C15C994A27EE015700DD8449 /* project.c in Sources */ = {isa = PBXBuildFile; fileRef = C15C994927EE015700DD8449 /* project.c */; };
 		C15C994F27EEE28800DD8449 /* PLS_update.c in Sources */ = {isa = PBXBuildFile; fileRef = C15C994E27EEE28800DD8449 /* PLS_update.c */; };
+		C15C995527EF0A1A00DD8449 /* G22_PMS.c in Sources */ = {isa = PBXBuildFile; fileRef = C15C995427EF0A1A00DD8449 /* G22_PMS.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,9 +25,9 @@
 
 /* Begin PBXFileReference section */
 		C15C993D27EE00E100DD8449 /* osProject */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = osProject; sourceTree = BUILT_PRODUCTS_DIR; };
-		C15C994927EE015700DD8449 /* project.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = project.c; sourceTree = "<group>"; };
 		C15C994E27EEE28800DD8449 /* PLS_update.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PLS_update.c; sourceTree = "<group>"; };
 		C15C995127EEEC0C00DD8449 /* comment */ = {isa = PBXFileReference; lastKnownFileType = text; path = comment; sourceTree = "<group>"; };
+		C15C995427EF0A1A00DD8449 /* G22_PMS.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = G22_PMS.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,9 +60,9 @@
 		C15C993F27EE00E100DD8449 /* osProject */ = {
 			isa = PBXGroup;
 			children = (
-				C15C994927EE015700DD8449 /* project.c */,
 				C15C994E27EEE28800DD8449 /* PLS_update.c */,
 				C15C995127EEEC0C00DD8449 /* comment */,
+				C15C995427EF0A1A00DD8449 /* G22_PMS.c */,
 			);
 			path = osProject;
 			sourceTree = "<group>";
@@ -123,8 +123,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C15C995527EF0A1A00DD8449 /* G22_PMS.c in Sources */,
 				C15C994F27EEE28800DD8449 /* PLS_update.c in Sources */,
-				C15C994A27EE015700DD8449 /* project.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
