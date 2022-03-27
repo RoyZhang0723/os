@@ -9,6 +9,29 @@
 #include <errno.h>
 #define CHILD_NUMBER 13
 
+struct Staff
+{
+    int Project[5];
+    int Manger;
+    int Team[5];
+    int attend_team_number;
+};
+
+struct Project
+{
+    int Member[4];
+    int Staff_number;
+};
+
+char create_pro_team[3] = {'c', 'p', 0};
+char project_meeting_book[3] = {'p', 'b', 0};
+char meeting_attend[3] = {'m', 'a', 0};
+char fcfs[3] = {'f', 'f', 0};
+char sjf[3] = {'s', 'j', 0};
+char exit_PMS[3] = {'e', 'x', 0};
+
+
+
 
 int extract_int(char *s, int start, int len);
 int year(int yr);
@@ -16,11 +39,11 @@ int month(int yr, int mth);
 int day(char *s1, char *s2);
 char *IntToString(int num, char *str);
 char *IntToDay(char *startDate, int start, int num);
+char** split(char *str, char *delimiter);
 
 
 
-
-void create_project_team(int fd[13][2], char* command);
+void create_project_team(int fd[13][2], char* command, int len);
 void single_input_meeting_request(int fd[13][2], char* command);
 void batch_input_meeting_request(int fd[13][2], char* command);
 void meeting_attendance_request(int fd[13][2]);
@@ -40,7 +63,17 @@ int main() {
     int toParent[13][2];
     int pid = 0;
     int index = 0;
+    struct Staff staff[8];
+    struct Project project[5];
     
+    
+    for (i = 0; i < 8; i++) {
+        staff[i].attend_team_number = 0;
+    }
+    
+    for (i = 0; i < 5; i++) {
+        project[i].Staff_number = 0;
+    }
     
     for (i = 0; i < 13; i++) {
         if (pipe(toChild[i]) < 0) {
@@ -73,45 +106,63 @@ int main() {
     }
     
     else if (pid == 0){
-        if (index == 0) {
-            
-            exit(0);
+        for (i = 0; i < CHILD_NUMBER; i++) {
+            if (i == index) {
+                close(toParent[i][0]);
+                close(toChild[i][1]);
+            } else {
+                close(toParent[i][0]);
+                close(toParent[i][1]);
+                close(toChild[i][0]);
+                close(toChild[i][1]);
+            }
         }
-        if (index == 1) {
-            exit(0);
-        }
-        if (index == 2) {
-            exit(0);
-        }
-        if (index == 3) {
-            exit(0);
-        }
-        if (index == 4) {
-            exit(0);
-        }
-        if (index == 5) {
-            exit(0);
-        }
-        if (index == 6) {
-            exit(0);
-        }
-        if (index == 7) {
-            exit(0);
-        }
-        if (index == 8) {
-            exit(0);
-        }
-        if (index == 9) {
-            exit(0);
-        }
-        if (index == 10) {
-            exit(0);
-        }
-        if (index == 11) {
-            exit(0);
-        }
-        if (index == 12) {
-            exit(0);
+        char buf[100];
+        int num;
+        
+        char opertion[3];
+        char information[8];
+        while (true) {
+            if ((num = read(toChild[index][0], buf, 10)) > 0) {
+                opertion[0] = buf[0];
+                opertion[1] = buf[1];
+                opertion[2] = 0;
+                strncpy(information, buf + 2, 6);
+                
+                if (index < 8) {
+                    if (strcmp(opertion, create_pro_team) == 0) {
+                        if (strlen(information) == 2) {
+                            staff[index].Project[staff[index].attend_team_number] = information[1] - 'A';
+                            staff[index].Team[staff[index].attend_team_number] = information[0] - 'A';
+                            staff[index].attend_team_number++;
+                        }
+                        if (strlen(information) == 4) {
+                            staff[index].Project[staff[index].attend_team_number] = information[1] - 'A';
+                            staff[index].Team[staff[index].attend_team_number] = information[0] - 'A';
+                            staff[index].attend_team_number++;
+                            staff[index].Manger = information[0] - 'A';
+                        }
+                    }
+                    if (strcmp(opertion, exit_PMS) == 0) {
+                        break;
+                    }
+                } else {
+                    if (strcmp(opertion, create_pro_team) == 0) {
+                        int staff_number = strlen(information);
+                        i = 0;
+                        while (staff_number > 0) {
+                            project[index].Member[project[index].Staff_number] = information[i] - 'A';
+                            project[index].Staff_number++;
+                            staff_number--;
+                            i++;
+                        }
+                    }
+                    if (strcmp(opertion, exit_PMS) == 0) {
+                        break;
+                    }
+                }
+                
+            }
         }
         
     }
@@ -142,7 +193,7 @@ int main() {
                     if (strncmp(command, "0", 1)) {
                         break;
                     } else {
-                        create_project_team(toChild, command);
+                        create_project_team(toChild, command, len);
                     }
                 }
 
@@ -172,15 +223,58 @@ int main() {
                 }
             }
             else if (strncmp(option, "4", 1) == 0) {
+                for (i = 0; i < 13; i++) {
+                    char temp[5];
+                    strcpy(temp, exit_PMS);
+                    write(toChild[i][1], temp, strlen(temp));
+                }
                 break;
-            }
-            else if (strncmp(option, "0", 1) == 0){
-                continue;
             }
         }
     }
     return 0;
 }
+
+void create_project_team(int fd[13][2], char* command, int len) {
+    char useful_inf[6];
+    char** res = split(command, " ");
+    int i = 0;
+    while (res[i] != NULL) {
+        if (i == 0) {
+            useful_inf[i] = res[i][5];
+        } else if (i == 1) {
+            useful_inf[i] = res[i][8];
+        } else {
+            useful_inf[i] = res[i][0];
+        }
+        i++;
+    }
+    int useful_inf_len = i;
+    char to_member_message[10];
+    char to_manager_message[10];
+    char to_project_message[10];
+    char temp[5];
+    char mananger_message[2] = "MM";
+    strcpy(to_member_message, create_pro_team);
+    strcpy(to_manager_message, create_pro_team);
+    strcpy(to_project_message, create_pro_team);
+    strncpy(temp, useful_inf, 2);
+    strcat(to_member_message, temp);
+    strcat(to_manager_message, temp);
+    strcat(to_manager_message, mananger_message);
+    strncpy(temp, useful_inf + 2, 4);
+    strcat(to_project_message, temp);
+    for (i = 2; i < useful_inf_len; i++) {
+        if (i == 2) {
+            write(fd[useful_inf[i] - 'A'], to_manager_message, strlen(to_manager_message));
+        } else {
+            write(fd[useful_inf[i] - 'A'], to_member_message, strlen(to_member_message));
+        }
+    }
+    write(fd[useful_inf[1] - 'A' + 8], to_project_message, strlen(to_project_message));
+}
+
+
 
 
 int extract_int(char *s, int start, int len) {
@@ -306,4 +400,29 @@ char *IntToDay(char *startDate, int start, int num) {
         }
     }
     return startDate;
+}
+
+char** split(char *str, char *delimiter) {
+    int len = strlen(str);
+    char *strCopy = (char*)malloc((len + 1) * sizeof(char));
+    strcpy(strCopy, str);
+    for (int i = 0; strCopy[i] != '\0'; i++) {
+        for (int j = 0; delimiter[j] != '\0'; j++) {
+            if (strCopy[i] == delimiter[j]) {
+                strCopy[i] = '\0';
+                break;
+            }
+        }
+    }
+    char** res = (char**)malloc((len + 2) * sizeof(char*));
+    len++;
+    int resI = 0;
+    for (int i = 0; i < len; i++) {
+        res[resI++] = strCopy + i;
+        while (strCopy[i] != '\0') {
+            i++;
+        }
+    }
+    res[resI] = NULL;
+    return res;
 }

@@ -41,3 +41,9 @@ return the number of dates in a specific month
 "int day(char *s1, char *s2)"
 return the number of dates between s1 and s2
 if the date is illegal, return -1
+
+
+"char** split(char *str, char *delimiter);"
+same to python split function
+
+ZhangXinyu 3.27 work commit: added a string segmentation function, modified the overall architecture of the main function, and wrote part of the create_project_team function.
