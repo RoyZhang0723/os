@@ -47,3 +47,5 @@ if the date is illegal, return -1
 same to python split function
 
 ZhangXinyu 3.27 work commit: added a string segmentation function, modified the overall architecture of the main function, and wrote part of the create_project_team function.
+
+ZhangXinyu 3.28 work commit: write the content of two functions: single_input_meeting_request and batch_input_meeting_request

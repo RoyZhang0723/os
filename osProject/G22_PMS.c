@@ -8,6 +8,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #define CHILD_NUMBER 13
+#define MAX_LINE 162
+
 
 struct Staff
 {
@@ -36,6 +38,8 @@ char exit_PMS[3] = {'e', 'x', 0};
 int extract_int(char *s, int start, int len);
 int year(int yr);
 int month(int yr, int mth);
+bool is_vaild_day(char *s1);
+bool is_vaild_time(char *s1);
 int day(char *s1, char *s2);
 char *IntToString(int num, char *str);
 char *IntToDay(char *startDate, int start, int num);
@@ -44,8 +48,8 @@ char** split(char *str, char *delimiter);
 
 
 void create_project_team(int fd[13][2], char* command, int len);
-void single_input_meeting_request(int fd[13][2], char* command);
-void batch_input_meeting_request(int fd[13][2], char* command);
+int single_input_meeting_request(int fd[13][2], char* useful_inf);
+int batch_input_meeting_request(int fd[13][2], char* useful_inf);
 void meeting_attendance_request(int fd[13][2]);
 void FCFS(int fd[13][2]);
 void SJF(int fd[13][2]);
@@ -63,6 +67,8 @@ int main() {
     int toParent[13][2];
     int pid = 0;
     int index = 0;
+    input_file = ("Input_Meeting.txt", "w");
+    
     struct Staff staff[8];
     struct Project project[5];
     
@@ -202,9 +208,19 @@ int main() {
                 while (true) {
                     len = read(0, command, 100);
                     if (strncmp(command, "For 2a", 6) == 0) {
-                        single_input_meeting_request(toChild, command);
+                        char useful_inf[30];
+                        strncpy(useful_inf, command + 8, 30);
+                        if (single_input_meeting_request(toChild, useful_inf) < 0) {
+                            printf("Invaild time\n");
+                        } else {
+                            printf("Record\n");
+                        }
                     } else if (strncmp(command, "For 2b", 6) == 0) {
-                        batch_input_meeting_request(toChild, command);
+                        char useful_inf[30];
+                        strncpy(useful_inf, command + 8, 30);
+                        int record_num = 0;
+                        record_num = batch_input_meeting_request(toChild, useful_inf);
+                        printf("%d meeting requests have been recorded", record_num);
                     } else {
                         meeting_attendance_request(toChild);
                     }
@@ -274,7 +290,46 @@ void create_project_team(int fd[13][2], char* command, int len) {
     write(fd[useful_inf[1] - 'A' + 8], to_project_message, strlen(to_project_message));
 }
 
+int single_input_meeting_request(int fd[13][2], char* useful_inf) {
+    char team[2], day[11], start_time[6], hours[2];
+    strncpy(team, useful_inf + 5, 1);
+    strncpy(day, useful_inf + 7, 10);
+    strncpy(start_time, useful_inf + 18, 5);
+    strncpy(hours, useful_inf + 24, 1);
+    if (!is_vaild_day(day)) {
+        return -1;
+    }
+    if (!is_vaild_time(start_time)) {
+        return -1;
+    }
+    fprintf(input_file, "%s\n", useful_inf);
+    return 1;
+}
 
+
+int batch_input_meeting_request(int fd[13][2], char* command) {
+    char useful_inf[30];
+    strncpy(useful_inf, command + 8, 30);
+    int i = 0, line_num = 0, len = 0;
+    char buf[MAX_LINE];
+    char use_inf[30];
+    FILE *fp;
+    if ((fp = fopen(useful_inf, "r")) == NULL) {
+        printf("fail to read the file");
+        return -1;
+    }
+    
+    while (fgets(buf, MAX_LINE, fp) != NULL) {
+        len = strlen(buf);
+        buf[len - 1] = '\0';
+        strcpy(use_inf, buf);
+        if (single_input_meeting_request(fd, use_inf) > 0) {
+            line_num++;
+        }
+    }
+    fclose(fp);
+    return line_num;
+}
 
 
 int extract_int(char *s, int start, int len) {
@@ -299,6 +354,31 @@ int month(int yr, int mth) {
         return days[mth];
     else
         return days[mth] + year(yr);
+}
+
+bool is_vaild_day(char *s1) {
+    int yr, mth, dy;
+    int mth_and_day;
+    yr = extract_int(s1, 0, 4);
+    mth = extract_int(s1, 5, 2);
+    dy = extract_int(s1, 8, 2);
+    if (yr != 2022) {
+        return false;
+    }
+    mth_and_day = mth * 100 + dy;
+    if (mth < 415 || mth > 514) {
+        return false;
+    }
+    return true;
+}
+
+bool is_vaild_time(char *s1) {
+    int time;
+    time =extract_int(s1, 0, 2);
+    if (time < 9 || time > 18) {
+        return false;
+    }
+    return true;
 }
 
 
