@@ -58,16 +58,16 @@ void analyse_attendance(int fd[13][2]);
 
 
 
-FILE *input_file;
-
 
 int main() {
+    FILE *input_file;
+    input_file = fopen("Input_Meeting.txt", "w");
+    fclose(input_file);
     int i;
     int toChild[13][2];
     int toParent[13][2];
     int pid = 0;
     int index = 0;
-    input_file = ("Input_Meeting.txt", "w");
     
     struct Staff staff[8];
     struct Project project[5];
@@ -182,21 +182,21 @@ int main() {
             close(toParent[i][1]);
         }
         while (true) {
-            printf("    ~~ WELCOME TO PolyStar ~~\n");
-            printf("1.   Create Project Team\n");
+            printf("    ~~ WELCOME TO PolyStar ~~\n\n");
+            printf("1.   Create Project Team\n\n");
             printf("2.   Project Meeting Request\n");
             printf("2a.  Single input\n2b.  Batch input\n2c.  Meeting Attendance\n\n");
             printf("3.  Print Meeting Schedule\n3a.  FCFS (First Come First Served)\n3b.  XXXX (Another algorithm implemented)\n3c.  YYYY (Attendance Report) \n\n");
-            printf("4.  Exit\n\n");
-            printf("Enter an option: ");
-            len = read(0, command, 100);
-            command[--len] = 0;
+            printf("4.  Exit\n\nEnter an option: ");
+            fgets(command, 100, stdin);
             strncpy(option, command, 1);
             if (strncmp(option, "1", 1) == 0) {
                 while (true) {
-                    len = read(0, command, 100);
+                    printf("\nEnter> ");
+                    fgets(command, 100, stdin);
+                    len = strlen(command);
                     command[--len] = 0;
-                    if (strncmp(command, "0", 1)) {
+                    if (strncmp(command, "0", 1) == 0) {
                         break;
                     } else {
                         create_project_team(toChild, command, len);
@@ -206,21 +206,26 @@ int main() {
             }
             else if (strncmp(option, "2", 1) == 0) {
                 while (true) {
-                    len = read(0, command, 100);
+                    printf("\nEnter> ");
+                    fgets(command, 100, stdin);
+                    len = strlen(command);
+                    command[--len] = 0;
                     if (strncmp(command, "For 2a", 6) == 0) {
                         char useful_inf[30];
                         strncpy(useful_inf, command + 8, 30);
                         if (single_input_meeting_request(toChild, useful_inf) < 0) {
-                            printf("Invaild time\n");
+                            printf(">>>>>>Invaild time\n");
                         } else {
-                            printf("Record\n");
+                            printf(">>>>>>Record\n");
                         }
                     } else if (strncmp(command, "For 2b", 6) == 0) {
                         char useful_inf[30];
                         strncpy(useful_inf, command + 8, 30);
                         int record_num = 0;
                         record_num = batch_input_meeting_request(toChild, useful_inf);
-                        printf("%d meeting requests have been recorded", record_num);
+                        printf(">>>>>>%d meeting requests have been recorded\n", record_num);
+                    } else if (strncmp(command, "0", 1) == 0){
+                        break;
                     } else {
                         meeting_attendance_request(toChild);
                     }
@@ -228,7 +233,7 @@ int main() {
             }
             else if (strncmp(option, "3", 1) == 0) {
                 while (true) {
-                    len = read(0, command, 100);
+                    fgets(command, 100, stdin);
                     if (strncmp(command, "For 3a", 6) == 0) {
                         FCFS(toChild);
                     } else if (strncmp(command, "For 3b", 6) == 0) {
@@ -244,7 +249,13 @@ int main() {
                     strcpy(temp, exit_PMS);
                     write(toChild[i][1], temp, strlen(temp));
                 }
+                for (i = 1; i <= CHILD_NUMBER; i++) {
+                    wait(NULL);
+                }
                 break;
+            }
+            else {
+                printf("\nThe comment is illegal. Please reenter the comment.\n");
             }
         }
     }
@@ -288,34 +299,44 @@ void create_project_team(int fd[13][2], char* command, int len) {
         }
     }
     write(fd[useful_inf[1] - 'A' + 8], to_project_message, strlen(to_project_message));
+    printf("\n>>>>>> Project Team %c is creaded\n", res[0][5]);
 }
 
-int single_input_meeting_request(int fd[13][2], char* useful_inf) {
+int single_input_meeting_request(int fd[13][2], char useful_inf[30]) {
+    FILE *input_file;
+    input_file = fopen("Input_Meeting.txt", "a");
     char team[2], day[11], start_time[6], hours[2];
     strncpy(team, useful_inf + 5, 1);
     strncpy(day, useful_inf + 7, 10);
     strncpy(start_time, useful_inf + 18, 5);
     strncpy(hours, useful_inf + 24, 1);
     if (!is_vaild_day(day)) {
+        printf("It is invaild time\n");
         return -1;
     }
     if (!is_vaild_time(start_time)) {
+        printf("It is invaild time\n");
         return -1;
     }
-    fprintf(input_file, "%s\n", useful_inf);
+    fprintf(input_file, "%s", useful_inf);
+    fclose(input_file);
     return 1;
 }
 
 
 int batch_input_meeting_request(int fd[13][2], char* command) {
+    printf("command : %s\n", command);
     char useful_inf[30];
-    strncpy(useful_inf, command + 8, 30);
+    char toInputFile[30];
+    strcpy(useful_inf, command);
+    strcpy(toInputFile, "For 2b, ");
     int i = 0, line_num = 0, len = 0;
     char buf[MAX_LINE];
     char use_inf[30];
     FILE *fp;
+    printf("%s\n", useful_inf);
     if ((fp = fopen(useful_inf, "r")) == NULL) {
-        printf("fail to read the file");
+        printf("fail to read the file\n");
         return -1;
     }
     
@@ -323,13 +344,29 @@ int batch_input_meeting_request(int fd[13][2], char* command) {
         len = strlen(buf);
         buf[len - 1] = '\0';
         strcpy(use_inf, buf);
-        if (single_input_meeting_request(fd, use_inf) > 0) {
+        strcat(toInputFile, use_inf);
+        if (single_input_meeting_request(fd, toInputFile) > 0) {
             line_num++;
         }
     }
     fclose(fp);
     return line_num;
 }
+
+void meeting_attendance_request(int fd[13][2]) {
+    return;
+}
+void FCFS(int fd[13][2]) {
+    return;
+}
+void SJF(int fd[13][2]) {
+    return;
+}
+void analyse_attendance(int fd[13][2]) {
+    return;
+}
+
+
 
 
 int extract_int(char *s, int start, int len) {
@@ -366,8 +403,12 @@ bool is_vaild_day(char *s1) {
         return false;
     }
     mth_and_day = mth * 100 + dy;
-    if (mth < 415 || mth > 514) {
+    if (mth_and_day < 415 || mth_and_day > 514) {
         return false;
+    } else {
+        if (mth_and_day == 417 || mth_and_day == 424 || mth_and_day == 501 || mth_and_day == 508 || mth_and_day == 515) {
+            return false;
+        }
     }
     return true;
 }
@@ -486,8 +527,9 @@ char** split(char *str, char *delimiter) {
     int len = strlen(str);
     char *strCopy = (char*)malloc((len + 1) * sizeof(char));
     strcpy(strCopy, str);
-    for (int i = 0; strCopy[i] != '\0'; i++) {
-        for (int j = 0; delimiter[j] != '\0'; j++) {
+    int i, j;
+    for (i = 0; strCopy[i] != '\0'; i++) {
+        for (j = 0; delimiter[j] != '\0'; j++) {
             if (strCopy[i] == delimiter[j]) {
                 strCopy[i] = '\0';
                 break;
@@ -497,7 +539,7 @@ char** split(char *str, char *delimiter) {
     char** res = (char**)malloc((len + 2) * sizeof(char*));
     len++;
     int resI = 0;
-    for (int i = 0; i < len; i++) {
+    for (i = 0; i < len; i++) {
         res[resI++] = strCopy + i;
         while (strCopy[i] != '\0') {
             i++;
@@ -506,3 +548,4 @@ char** split(char *str, char *delimiter) {
     res[resI] = NULL;
     return res;
 }
+
